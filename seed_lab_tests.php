@@ -1,0 +1,246 @@
+<?php
+// Seed LabTesting items with INR prices into service_items
+require 'db.php';
+
+try {
+    // Ensure services row exists for LabTesting
+    $pdo->exec("CREATE TABLE IF NOT EXISTS services (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        slug VARCHAR(100) NOT NULL UNIQUE,
+        base_price DECIMAL(10,2) DEFAULT 0.00,
+        active TINYINT(1) DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    $stmt = $pdo->prepare("INSERT IGNORE INTO services (name, slug, base_price, active) VALUES ('Lab Testing','LabTesting',0,1)");
+    $stmt->execute();
+
+    // Ensure service_items table exists
+    $pdo->exec("CREATE TABLE IF NOT EXISTS service_items (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        service_slug VARCHAR(100) NOT NULL,
+        name VARCHAR(150) NOT NULL,
+        price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+        active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX (service_slug)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+    $items = [
+        // BIOCHEMISTRY
+        ['Adenosine Deaminase (ADA), Serum',300],
+        ['Alkaline Phosphatase (ALP), Serum',150],
+        ['Albumin, Serum',150],
+        ['Amylase, Serum',250],
+        ['Bilirubin Total, Serum',200],
+        ['Bilirubin Direct & Indirect, Serum',350],
+        ['Bilirubin Direct, Serum',200],
+        ['Blood Urea Nitrogen (BUN), Serum',200],
+        ['Calcium, Serum',200],
+        ['Cholesterol Total, Serum',150],
+        ['Cholesterol HDL, Serum',250],
+        ['Cholesterol LDL, Serum',300],
+        ['Cholesterol VLDL, Serum',200],
+        ['Chloride, Serum',300],
+        ['CK-MB, Serum',250],
+        ['Creatinine, Serum',200],
+        ['Serum Electrolytes',550],
+        ['Glucose Fasting, Serum',70],
+        ['Glucose Random, Serum',70],
+        ['Glucose Post-Prandial, Serum',70],
+        ['Gamma-Glutamyl Transferase (GGT), Serum',250],
+        ['Glucose Tolerance Test (GTT), Serum',850],
+        ['Ionised Calcium',300],
+        ['Total Iron, Serum',350],
+        ['Total Iron Binding Capacity (TIBC), Serum',350],
+        ['TIBC & UIBC, Serum',500],
+        ['Lipid Profile, Serum',850],
+        ['Iron Profile (Fe, TIBC, UIBC), Serum',650],
+        ['Triglycerides, Serum',200],
+        ['LDH, Serum',250],
+        ['Lipase, Serum',500],
+        ['Liver Function Test (LFT), Serum',850],
+        ['Magnesium',300],
+        ['Microprotein / Albumin (Urine)',250],
+        ['Potassium, Serum',300],
+        ['Protein Total, Serum / Fluid',150],
+        ['Phosphorus, Serum',300],
+        ['Kidney Function Test (KFT / RFT), Serum',400],
+        ['SGOT (AST), Serum',200],
+        ['SGPT (ALT), Serum',200],
+        ['Sodium, Serum',300],
+        ['Urea, Serum',200],
+        ['Uric Acid, Serum',200],
+        ['Urine 24 Hr Protein / Albumin / Creatinine',300],
+        ['Urine Albumin Creatinine Ratio (ACR)',400],
+        // CLINICAL PATHOLOGY / CYTOLOGY
+        ['Bence Jones Protein, Urine',200],
+        ['Bile Salt Pigment, Urine',50],
+        ['Body Fluid Analysis',400],
+        ['Body Fluid AFB / Gram Stain (each)',200],
+        ['Body Fluid ADA',300],
+        ['Cytology',500],
+        ['CSF Analysis',500],
+        ['CSF India Ink',300],
+        ['FNAC',750],
+        ['FNAC Without Procedure',600],
+        ['Hanging Drop, Stool',100],
+        ['India Ink',300],
+        ['Ketone Bodies, Urine',70],
+        ['Nasal Smear for Eosinophils',250],
+        ['Pap Smear (Conventional)',350],
+        ['Pap Smear (LBC)',900],
+        ['Pregnancy Test',100],
+        ['Semen Analysis',1500],
+        ['Stool Benedict’s Test',300],
+        ['Stool Routine',150],
+        ['Stool Occult Blood',100],
+        ['Urine Routine',100],
+        ['Urine Microalbumin',250],
+        ['Urethral Smear Gram Stain',250],
+        // HAEMATOLOGY
+        ['Absolute Lymphocyte Count',70],
+        ['Absolute Neutrophil Count',70],
+        ['APTT',300],
+        ['BT / CT',70],
+        ['Blood Group & Rh',70],
+        ['Bone Marrow Examination',1200],
+        ['CBC (Complete Blood Count)',350],
+        ['Coagulation Profile',550],
+        ['D-Dimer',950],
+        ['Differential Count (DLC)',70],
+        ['ESR',70],
+        ['HbA1c',600],
+        ['Hemoglobin (Hb)',70],
+        ['INR',300],
+        ['I:T Ratio',150],
+        ['MP Blood Smear',100],
+        ['LE Cell',300],
+        ['MCH',70],
+        ['MCV',70],
+        ['MCHC',70],
+        ['PCV',70],
+        ['Platelet Count',70],
+        ['Peripheral Blood Smear',350],
+        ['PT/INR',300],
+        ['RBC Count',100],
+        ['Reticulocyte Count',70],
+        ['Sepsis Screen',650],
+        // HISTOPATHOLOGY
+        ['Small Biopsy (1 vial)',1000],
+        ['Small Biopsy (2 vials)',1600],
+        ['Small Biopsy (3 vials)',2400],
+        ['Skin Biopsy',1800],
+        ['Medium Biopsy',1800],
+        ['Large Biopsy',2800],
+        ['Cancer Specimen',4000],
+        // SEROLOGY
+        ['ASO',300],
+        ['CRP',300],
+        ['CRP Quantitative',650],
+        ['HAV Ab',350],
+        ['HIV Ab',350],
+        ['HBsAg',350],
+        ['HCV Ab',350],
+        ['HEV Ab',350],
+        ['H. Pylori Antigen (Stool)',950],
+        ['H. Pylori Antigen (Serum)',350],
+        ['Leptospira IgM',600],
+        ['MP ICT',250],
+        ['Rheumatoid Factor (RA)',300],
+        ['Scrub Typhus (ICT)',500],
+        ['Scrub Typhus (Weil-Felix)',500],
+        ['Syphicheck',200],
+        ['Widal Test',200],
+        ['VDRL',200],
+        ['Typhicheck IgM/IgG',400],
+        ['Triple Test (HBsAg, HCV, HIV)',600],
+        ['Troponin I',750],
+        ['Cardiac Troponin (cTn-I)',850],
+        ['Dengue',700],
+        ['NT-Pro BNP',1400],
+        // MICROBIOLOGY
+        ['AFB / ZN Stain',200],
+        ['Blood Culture',1250],
+        ['Culture & Sensitivity',800],
+        ['Fungal Stain',500],
+        ['Gram Stain',200],
+        ['Mantoux Test',150],
+        // IMMUNOASSAY
+        ['Anti CCP',1800],
+        ['Beta hCG',900],
+        ['CA-125',1350],
+        ['CEA',850],
+        ['Ferritin',700],
+        ['FSH',600],
+        ['FSH / LH / Prolactin Panel',1800],
+        ['Folic Acid',1400],
+        ['IgE',800],
+        ['Prolactin',600],
+        ['Procalcitonin',1500],
+        ['PSA (Free)',700],
+        ['PSA (Total)',700],
+        ['PSA Ratio Panel',1400],
+        ['TFT (T3, T4, TSH)',700],
+        ['T3',350],
+        ['T4',350],
+        ['TSH',350],
+        ['FT3',400],
+        ['FT4',400],
+        ['Vitamin B12',1100],
+        ['Vitamin D',1500],
+        ['Alpha-Feto Protein',850],
+        // OTHERS
+        ['ECG',400],
+        // SPECIALISED
+        ['HPV',2000],
+        ['HPV Duo (PAP + PCR)',2800],
+        ['IgG',1150],
+        ['AMH',2500],
+        ['Mycoreal (PCR)',2450],
+        ['Xpert MTB / RIF Ultra (Extra-Pulmonary)',2700],
+        ['ANA by IFA',1600],
+        ['ANA Profile (IFA + ENA Blot)',4700],
+        ['HSV 1 & 2 IgG',4500],
+        ['Vitamin D 1,25',4500],
+        ['CA 19.9',1800],
+        ['ENA Panel',4500],
+        ['Cortisol',1000],
+        ['TORCH Panel',3800],
+        ['PTH Intact',2400],
+        ['C-Peptide',1600],
+        ['Insulin (any type)',1250],
+        ['Lithium',900],
+        ['Anti-Thyroglobulin Ab',2100],
+        ['Anti-TPO Ab',2050],
+        ['ER/PR HER2 (Tissue)',3300],
+        ['Total Testosterone',1050],
+        ['Progesterone',1050],
+        ['Direct Coombs',950],
+        ['Indirect Coombs',100],
+        ['Growth Hormone',1200],
+        ['Couple Karyotyping',5800],
+        ['HB Electrophoresis',1400],
+        ['Fecal Calprotectin',3400],
+        ['APLA (Total)',5400],
+    ];
+
+    // Insert if not existing for LabTesting
+    $exists = $pdo->prepare('SELECT COUNT(*) FROM service_items WHERE service_slug=? AND name=?');
+    $ins = $pdo->prepare('INSERT INTO service_items (service_slug, name, price, active) VALUES (?,?,?,1)');
+    $added = 0; $skipped = 0;
+    foreach ($items as [$name,$price]) {
+        $exists->execute(['LabTesting',$name]);
+        if ((int)$exists->fetchColumn() === 0) {
+            $ins->execute(['LabTesting',$name,$price]);
+            $added++;
+        } else {
+            $skipped++;
+        }
+    }
+    echo "Seed complete. Added: $added, Skipped: $skipped\n";
+} catch (Exception $e) {
+    echo 'Error: '.$e->getMessage()."\n";
+}
+?>
+
